@@ -19,7 +19,7 @@ To run this app, you just need a few basic things installed on your computer.
 1. Click your Windows Start button, type `cmd`, and open **Command Prompt**.
 2. Type this exact command and press Enter to download the app to your computer:
    ```cmd
-   git clone https://github.com/your-username/echoflow.git
+   git clone https://github.com/SathtikBose/EchoFlow.git
    ```
 3. Type this to go inside the newly downloaded folder:
    ```cmd
