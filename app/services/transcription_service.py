@@ -29,8 +29,11 @@ class TranscriptionService(QThread):
         self.snippet_processor = SnippetProcessor()
         self.audio_data: bytes | None = None
         self.mode: str = "default"
+        self.app_context: str | None = None
 
-    def start_transcription(self, audio_data: bytes, mode: str = "default") -> None:
+    def start_transcription(
+        self, audio_data: bytes, mode: str = "default", app_context: str | None = None
+    ) -> None:
         """Called by the main thread to begin transcription."""
         if self.isRunning():
             logger.warning("Transcription already in progress.")
@@ -38,6 +41,7 @@ class TranscriptionService(QThread):
 
         self.audio_data = audio_data
         self.mode = mode
+        self.app_context = app_context
         self.start()
 
     def run(self) -> None:
@@ -79,7 +83,9 @@ class TranscriptionService(QThread):
             # Step 2: LLM Transformation (if configured)
             if self.llm_provider and transcript:
                 transcript = loop.run_until_complete(
-                    self.llm_provider.transform_text(transcript, mode=self.mode)
+                    self.llm_provider.transform_text(
+                        transcript, mode=self.mode, app_context=self.app_context
+                    )
                 )
 
             loop.close()

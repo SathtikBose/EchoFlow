@@ -58,7 +58,10 @@ class EchoFlowApp(QApplication):
         self.current_mode = mode
 
     def _on_audio_ready(self, audio_data: bytes) -> None:
-        self.transcriber.start_transcription(audio_data, self.current_mode)
+        from app.utils.window import get_active_window_title
+
+        app_context = get_active_window_title()
+        self.transcriber.start_transcription(audio_data, self.current_mode, app_context)
 
     def _on_transcription_complete(self, data: str) -> None:
         try:

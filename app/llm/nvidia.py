@@ -50,7 +50,9 @@ class NvidiaLlmProvider(LlmProvider):
             ),
         }
 
-    async def transform_text(self, text: str, mode: str = "default") -> str:
+    async def transform_text(
+        self, text: str, mode: str = "default", app_context: str | None = None
+    ) -> str:
         if not self.api_key:
             raise ValueError("NVIDIA API key is not configured.")
 
@@ -65,6 +67,11 @@ class NvidiaLlmProvider(LlmProvider):
         }
 
         system_prompt = self.prompts.get(mode, self.prompts["default"])
+        if app_context:
+            system_prompt += (
+                f"\n\nContext: The user is currently typing in an application named "
+                f"'{app_context}'. Use this to infer domain-specific jargon or formatting."
+            )
 
         data = {
             "model": self.model,
