@@ -21,14 +21,16 @@ class TranscriptionService(QThread):
         self.speech_provider = speech_provider
         self.llm_provider = llm_provider
         self.audio_data: bytes | None = None
+        self.mode: str = "default"
 
-    def start_transcription(self, audio_data: bytes) -> None:
+    def start_transcription(self, audio_data: bytes, mode: str = "default") -> None:
         """Called by the main thread to begin transcription."""
         if self.isRunning():
             logger.warning("Transcription already in progress.")
             return
 
         self.audio_data = audio_data
+        self.mode = mode
         self.start()
 
     def run(self) -> None:
@@ -47,7 +49,9 @@ class TranscriptionService(QThread):
 
             # Step 2: LLM Transformation (if configured)
             if self.llm_provider and transcript:
-                transcript = loop.run_until_complete(self.llm_provider.transform_text(transcript))
+                transcript = loop.run_until_complete(
+                    self.llm_provider.transform_text(transcript, mode=self.mode)
+                )
 
             loop.close()
 

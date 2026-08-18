@@ -28,7 +28,7 @@ async def test_nvidia_llm_provider_success(mock_settings: MagicMock) -> None:
     mock_response.raise_for_status.return_value = None
 
     with patch("httpx.AsyncClient.post", return_value=mock_response) as mock_post:
-        transformed = await provider.transform_text(input_text)
+        transformed = await provider.transform_text(input_text, mode="formal")
 
         assert transformed == "Hello, world!"
         mock_post.assert_called_once()
@@ -37,6 +37,7 @@ async def test_nvidia_llm_provider_success(mock_settings: MagicMock) -> None:
         assert kwargs["headers"]["Authorization"] == "Bearer test_key"
         assert kwargs["json"]["model"] == "test_model"
         assert len(kwargs["json"]["messages"]) == 2
+        assert "formal tone" in kwargs["json"]["messages"][0]["content"]
         assert kwargs["json"]["messages"][1]["content"] == "hello world"
 
 

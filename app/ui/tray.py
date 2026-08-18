@@ -1,9 +1,15 @@
-from PySide6.QtCore import QObject
+import logging
+
+from PySide6.QtCore import QObject, Signal
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
 
+logger = logging.getLogger(__name__)
+
 
 class TrayManager(QObject):
+    mode_changed = Signal(str)
+
     def __init__(self, app: QApplication) -> None:
         super().__init__()
         self.app = app
@@ -19,7 +25,29 @@ class TrayManager(QObject):
             self.app.style().standardIcon(self.app.style().StandardPixmap.SP_ComputerIcon)
         )
 
+        self._setup_menu()
+        self.tray_icon.setToolTip("EchoFlow: Idle")
+        self.tray_icon.show()
+
+    def _setup_menu(self) -> None:
         self.tray_menu = QMenu()
+
+        # Modes Menu
+        self.mode_menu = QMenu("AI Mode", self.tray_menu)
+        self.mode_actions = {}
+        for mode in ["default", "formal", "casual", "code"]:
+            action = QAction(mode.capitalize(), self.mode_menu)
+            action.setCheckable(True)
+            action.triggered.connect(lambda checked, m=mode: self._set_mode(m))
+            self.mode_menu.addAction(action)
+            self.mode_actions[mode] = action
+
+        # Default mode checked
+        self.mode_actions["default"].setChecked(True)
+        self.current_mode = "default"
+
+        self.tray_menu.addMenu(self.mode_menu)
+        self.tray_menu.addSeparator()
 
         self.start_action = QAction("Start EchoFlow")
         self.settings_action = QAction("Settings")
@@ -35,8 +63,13 @@ class TrayManager(QObject):
         self.tray_menu.addAction(self.quit_action)
 
         self.tray_icon.setContextMenu(self.tray_menu)
-        self.tray_icon.setToolTip("EchoFlow: Idle")
-        self.tray_icon.show()
+
+    def _set_mode(self, mode: str) -> None:
+        for m, action in self.mode_actions.items():
+            action.setChecked(m == mode)
+        self.current_mode = mode
+        logger.info(f"AI Mode changed to: {mode}")
+        self.mode_changed.emit(mode)
 
         # Connect to app signals for UI updates
         # Check if the app has these properties (for type checker and runtime safety)
