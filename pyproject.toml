@@ -18,6 +18,7 @@ dependencies = [
     "pydantic>=2.7.0",
     "pydantic-settings>=2.2.1",
     "python-dotenv>=1.0.1",
+    "SpeechRecognition>=3.10.4",
 ]
 
 [project.optional-dependencies]

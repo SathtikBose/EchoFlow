@@ -8,7 +8,7 @@ from app.input.hotkeys import HotkeyManager
 from app.input.insertion import TextInserter
 from app.llm.nvidia import NvidiaLlmProvider
 from app.services.transcription_service import TranscriptionService
-from app.speech.nvidia import NvidiaSpeechProvider
+from app.speech.google_sr import GoogleSpeechProvider
 from app.ui.tray import TrayManager
 
 
@@ -28,11 +28,11 @@ class EchoFlowApp(QApplication):
 
         # Use try/except or lazy init if settings are missing?
         # For now, initialize the provider
-        self.speech_provider = NvidiaSpeechProvider()
         self.llm_provider = NvidiaLlmProvider()
+        self.speech_provider = GoogleSpeechProvider()
         self.transcriber = TranscriptionService(self.speech_provider, self.llm_provider)
 
-        # UI
+        # Audio Recorder
         self.tray = TrayManager(self)
         self.tray.mode_changed.connect(self._on_mode_changed)
 
