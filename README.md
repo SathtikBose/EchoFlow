@@ -42,20 +42,15 @@ While still in the Command Prompt (inside the `echoflow` folder), copy and paste
    pip install -e .
    ```
 
-### Step 4: Get your free NVIDIA AI Key
-EchoFlow uses NVIDIA's supercomputers to make your text perfect.
-1. Go to [build.nvidia.com](https://build.nvidia.com) and sign up for a free account.
-2. Look for "API Keys" in your account settings and generate a new key. It will look like a long string of random letters and numbers.
-3. Open the `echoflow` folder on your computer. 
-4. Find the file named `.env.example`, right-click it, and rename it to just `.env` (make sure there is a dot at the beginning).
-5. Open that `.env` file in Notepad. Delete the placeholder text and paste your key so it looks like this:
+### Step 4: Setup your Hotkey
+1. Open the `echoflow` folder on your computer. 
+2. Find the file named `.env.example`, right-click it, and rename it to just `.env` (make sure there is a dot at the beginning).
+3. Open that `.env` file in Notepad. You can change your hotkey here!
    ```ini
-   NVIDIA_API_KEY=your_long_api_key_goes_here
-   
-   # Optional: Change the hotkey (default is ctrl+space)
+   # Customize the hotkey (default is ctrl+alt+space)
    ECHOFLOW_HOTKEY=ctrl+alt+space
    ```
-6. Save and close Notepad.
+4. Save and close Notepad.
 
 ### Step 5: Start the App!
 In your Command Prompt, type:
