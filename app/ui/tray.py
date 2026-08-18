@@ -92,9 +92,13 @@ class TrayManager(QObject):
 
     def _on_transcription_error(self, error: str) -> None:
         self.tray_icon.setToolTip("EchoFlow: ✗ Error")
-        
+
     def notify(self, title: str, message: str, is_error: bool = False) -> None:
-        icon = QSystemTrayIcon.MessageIcon.Critical if is_error else QSystemTrayIcon.MessageIcon.Information
+        icon = (
+            QSystemTrayIcon.MessageIcon.Critical
+            if is_error
+            else QSystemTrayIcon.MessageIcon.Information
+        )
         self.tray_icon.showMessage(title, message, icon, 3000)
 
     def quit_app(self) -> None:

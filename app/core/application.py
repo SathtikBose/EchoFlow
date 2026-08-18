@@ -3,6 +3,7 @@ import sys
 from PySide6.QtWidgets import QApplication
 
 from app.audio.recorder import AudioRecorder
+from app.db.history import HistoryDB
 from app.input.hotkeys import HotkeyManager
 from app.input.insertion import TextInserter
 from app.llm.nvidia import NvidiaLlmProvider
@@ -20,6 +21,7 @@ class EchoFlowApp(QApplication):
         self.hotkeys = HotkeyManager()
         self.inserter = TextInserter()
         self.recorder = AudioRecorder()
+        self.history_db = HistoryDB()
 
         # State
         self.current_mode = "default"
@@ -58,9 +60,18 @@ class EchoFlowApp(QApplication):
     def _on_audio_ready(self, audio_data: bytes) -> None:
         self.transcriber.start_transcription(audio_data, self.current_mode)
 
-    def _on_transcription_complete(self, text: str) -> None:
-        print(f"App: Transcription complete: {text}")
-        self.inserter.insert_text(text)
+    def _on_transcription_complete(self, data: str) -> None:
+        try:
+            original, final = data.split("|", 1)
+        except ValueError:
+            original, final = data, data
+
+        print(f"App: Transcription complete: {final}")
+        self.inserter.insert_text(final)
+
+        # Save to DB
+        if final.strip():
+            self.history_db.add_record(original, final, self.current_mode, True)
 
     def _on_transcription_error(self, error: str) -> None:
         print(f"App: Transcription failed: {error}")

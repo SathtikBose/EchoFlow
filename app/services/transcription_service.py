@@ -48,7 +48,10 @@ class TranscriptionService(QThread):
             asyncio.set_event_loop(loop)
 
             # Step 1: Speech to Text
-            transcript = loop.run_until_complete(self.speech_provider.transcribe(self.audio_data))
+            original_transcript = loop.run_until_complete(
+                self.speech_provider.transcribe(self.audio_data)
+            )
+            transcript = original_transcript
 
             # Step 1.5: Voice Command check
             if transcript and self.command_processor.process(transcript):
@@ -64,7 +67,7 @@ class TranscriptionService(QThread):
 
             loop.close()
 
-            self.transcription_complete.emit(transcript)
+            self.transcription_complete.emit(f"{original_transcript}|{transcript}")
 
         except Exception as e:
             logger.error(f"Transcription service error: {e}")
