@@ -35,7 +35,20 @@ class TrayManager(QObject):
         self.tray_menu.addAction(self.quit_action)
 
         self.tray_icon.setContextMenu(self.tray_menu)
+        self.tray_icon.setToolTip("EchoFlow: Idle")
         self.tray_icon.show()
+
+        # Connect to app signals for UI updates
+        # Check if the app has these properties (for type checker and runtime safety)
+        if hasattr(self.app, "hotkeys"):
+            self.app.hotkeys.hotkey_pressed.connect(self._on_recording_start)
+            self.app.hotkeys.hotkey_released.connect(self._on_recording_stop)
+
+    def _on_recording_start(self) -> None:
+        self.tray_icon.setToolTip("EchoFlow: ● Listening...")
+
+    def _on_recording_stop(self) -> None:
+        self.tray_icon.setToolTip("EchoFlow: ◌ Transcribing...")
 
     def quit_app(self) -> None:
         self.app.quit()
