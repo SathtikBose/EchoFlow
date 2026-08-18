@@ -4,6 +4,7 @@ import logging
 from PySide6.QtCore import QThread, Signal
 
 from app.input.commands import CommandProcessor
+from app.input.dictionary import DictionaryProcessor
 from app.llm.base import LlmProvider
 from app.speech.base import SpeechProvider
 
@@ -23,6 +24,7 @@ class TranscriptionService(QThread):
         self.speech_provider = speech_provider
         self.llm_provider = llm_provider
         self.command_processor = CommandProcessor()
+        self.dictionary_processor = DictionaryProcessor()
         self.audio_data: bytes | None = None
         self.mode: str = "default"
 
@@ -52,6 +54,10 @@ class TranscriptionService(QThread):
                 self.speech_provider.transcribe(self.audio_data)
             )
             transcript = original_transcript
+
+            # Step 1.2: Dictionary Replacement
+            if transcript:
+                transcript = self.dictionary_processor.process(transcript)
 
             # Step 1.5: Voice Command check
             if transcript and self.command_processor.process(transcript):
