@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QApplication
 
 from app.audio.recorder import AudioRecorder
 from app.input.hotkeys import HotkeyManager
+from app.input.insertion import TextInserter
 from app.services.transcription_service import TranscriptionService
 from app.speech.nvidia import NvidiaSpeechProvider
 
@@ -15,6 +16,7 @@ class EchoFlowApp(QApplication):
 
         # Initialize services
         self.hotkeys = HotkeyManager()
+        self.inserter = TextInserter()
         self.recorder = AudioRecorder()
 
         # Use try/except or lazy init if settings are missing?
@@ -41,6 +43,7 @@ class EchoFlowApp(QApplication):
 
     def _on_transcription_complete(self, text: str) -> None:
         print(f"App: Transcription complete: {text}")
+        self.inserter.insert_text(text)
 
     def _on_transcription_error(self, error: str) -> None:
         print(f"App: Transcription failed: {error}")

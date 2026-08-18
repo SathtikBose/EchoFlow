@@ -1,5 +1,5 @@
-from collections.abc import AsyncGenerator
-from unittest.mock import AsyncMock, MagicMock, patch
+from collections.abc import Generator
+from unittest.mock import MagicMock, patch
 
 import httpx
 import pytest
@@ -8,7 +8,7 @@ from app.speech.nvidia import NvidiaSpeechProvider
 
 
 @pytest.fixture
-def mock_settings() -> AsyncGenerator[MagicMock, None]:
+def mock_settings() -> Generator[MagicMock, None, None]:
     with patch("app.speech.nvidia.settings") as mock:
         mock.nvidia_api_key = "test_key"
         mock.nvidia_base_url = "https://test.api.nvidia.com"
