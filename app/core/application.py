@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QApplication
 from app.audio.recorder import AudioRecorder
 from app.input.hotkeys import HotkeyManager
 from app.input.insertion import TextInserter
+from app.llm.nvidia import NvidiaLlmProvider
 from app.services.transcription_service import TranscriptionService
 from app.speech.nvidia import NvidiaSpeechProvider
 
@@ -22,7 +23,8 @@ class EchoFlowApp(QApplication):
         # Use try/except or lazy init if settings are missing?
         # For now, initialize the provider
         self.speech_provider = NvidiaSpeechProvider()
-        self.transcriber = TranscriptionService(self.speech_provider)
+        self.llm_provider = NvidiaLlmProvider()
+        self.transcriber = TranscriptionService(self.speech_provider, self.llm_provider)
 
         # Wire up hotkeys to audio recording
         self.hotkeys.hotkey_pressed.connect(self.recorder.start_recording)

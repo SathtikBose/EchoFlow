@@ -3,6 +3,7 @@ import logging
 
 from PySide6.QtCore import QThread, Signal
 
+from app.llm.base import LlmProvider
 from app.speech.base import SpeechProvider
 
 logger = logging.getLogger(__name__)
@@ -13,9 +14,12 @@ class TranscriptionService(QThread):
     transcription_complete = Signal(str)
     transcription_error = Signal(str)
 
-    def __init__(self, provider: SpeechProvider) -> None:
+    def __init__(
+        self, speech_provider: SpeechProvider, llm_provider: LlmProvider | None = None
+    ) -> None:
         super().__init__()
-        self.provider = provider
+        self.speech_provider = speech_provider
+        self.llm_provider = llm_provider
         self.audio_data: bytes | None = None
 
     def start_transcription(self, audio_data: bytes) -> None:
@@ -38,7 +42,13 @@ class TranscriptionService(QThread):
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
 
-            transcript = loop.run_until_complete(self.provider.transcribe(self.audio_data))
+            # Step 1: Speech to Text
+            transcript = loop.run_until_complete(self.speech_provider.transcribe(self.audio_data))
+
+            # Step 2: LLM Transformation (if configured)
+            if self.llm_provider and transcript:
+                transcript = loop.run_until_complete(self.llm_provider.transform_text(transcript))
+
             loop.close()
 
             self.transcription_complete.emit(transcript)
