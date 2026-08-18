@@ -31,7 +31,7 @@ class AudioRecorder(QObject):
         """List available input devices."""
         try:
             devices = sd.query_devices()
-            return [d for d in devices if d['max_input_channels'] > 0]
+            return [d for d in devices if d["max_input_channels"] > 0]
         except Exception as e:
             logger.error(f"Failed to list devices: {e}")
             return []

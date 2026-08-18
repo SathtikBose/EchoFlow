@@ -4,6 +4,8 @@ from PySide6.QtWidgets import QApplication
 
 from app.audio.recorder import AudioRecorder
 from app.input.hotkeys import HotkeyManager
+from app.services.transcription_service import TranscriptionService
+from app.speech.nvidia import NvidiaSpeechProvider
 
 
 class EchoFlowApp(QApplication):
@@ -15,12 +17,21 @@ class EchoFlowApp(QApplication):
         self.hotkeys = HotkeyManager()
         self.recorder = AudioRecorder()
 
+        # Use try/except or lazy init if settings are missing?
+        # For now, initialize the provider
+        self.speech_provider = NvidiaSpeechProvider()
+        self.transcriber = TranscriptionService(self.speech_provider)
+
         # Wire up hotkeys to audio recording
         self.hotkeys.hotkey_pressed.connect(self.recorder.start_recording)
         self.hotkeys.hotkey_released.connect(self.recorder.stop_recording)
 
         # Handle audio ready
-        self.recorder.audio_ready.connect(self._on_audio_ready)
+        self.recorder.audio_ready.connect(self.transcriber.start_transcription)
+
+        # Handle transcription results
+        self.transcriber.transcription_complete.connect(self._on_transcription_complete)
+        self.transcriber.transcription_error.connect(self._on_transcription_error)
 
         # Start hotkey listener
         self.hotkeys.start()
@@ -28,9 +39,11 @@ class EchoFlowApp(QApplication):
         # Cleanup on exit
         self.aboutToQuit.connect(self.shutdown)
 
-    def _on_audio_ready(self, audio_data: bytes) -> None:
-        # Placeholder for Phase 4: send to Speech-to-Text
-        print(f"App: Received {len(audio_data)} bytes of audio data.")
+    def _on_transcription_complete(self, text: str) -> None:
+        print(f"App: Transcription complete: {text}")
+
+    def _on_transcription_error(self, error: str) -> None:
+        print(f"App: Transcription failed: {error}")
 
     def shutdown(self) -> None:
         self.hotkeys.stop()

@@ -44,11 +44,21 @@ class TrayManager(QObject):
             self.app.hotkeys.hotkey_pressed.connect(self._on_recording_start)
             self.app.hotkeys.hotkey_released.connect(self._on_recording_stop)
 
+        if hasattr(self.app, "transcriber"):
+            self.app.transcriber.transcription_complete.connect(self._on_transcription_complete)
+            self.app.transcriber.transcription_error.connect(self._on_transcription_error)
+
     def _on_recording_start(self) -> None:
         self.tray_icon.setToolTip("EchoFlow: ● Listening...")
 
     def _on_recording_stop(self) -> None:
         self.tray_icon.setToolTip("EchoFlow: ◌ Transcribing...")
+
+    def _on_transcription_complete(self, text: str) -> None:
+        self.tray_icon.setToolTip("EchoFlow: ✓ Idle")
+
+    def _on_transcription_error(self, error: str) -> None:
+        self.tray_icon.setToolTip("EchoFlow: ✗ Error")
 
     def quit_app(self) -> None:
         self.app.quit()
