@@ -6,7 +6,6 @@ from app.audio.recorder import AudioRecorder
 from app.db.history import HistoryDB
 from app.input.hotkeys import HotkeyManager
 from app.input.insertion import TextInserter
-from app.llm.nvidia import NvidiaLlmProvider
 from app.services.transcription_service import TranscriptionService
 from app.speech.google_sr import GoogleSpeechProvider
 from app.ui.tray import TrayManager
@@ -20,7 +19,6 @@ class EchoFlowApp(QApplication):
         # Initialize services
         self.hotkeys = HotkeyManager()
         self.inserter = TextInserter()
-        self.recorder = AudioRecorder()
         self.history_db = HistoryDB()
 
         # State
@@ -40,13 +38,11 @@ class EchoFlowApp(QApplication):
         self.tray.mode_changed.connect(self._on_mode_changed)
 
         # Hotkeys
-        self.hotkey_manager = HotkeyManager()
-        self.hotkey_manager.hotkey_pressed.connect(self._on_hotkey_pressed)
-        self.hotkey_manager.hotkey_released.connect(self._on_hotkey_released)
-        self.hotkey_manager.hotkey_locked.connect(self._on_hotkey_locked)
+        self.hotkeys.hotkey_pressed.connect(self._on_hotkey_pressed)
+        self.hotkeys.hotkey_released.connect(self._on_hotkey_released)
+        self.hotkeys.hotkey_locked.connect(self._on_hotkey_locked)
 
-        # Use try/except or lazy init if settings are missing?
-        # For now, initialize the provider
+        # Provider
         self.speech_provider = GoogleSpeechProvider()
         self.transcriber = TranscriptionService(self.speech_provider)
 
