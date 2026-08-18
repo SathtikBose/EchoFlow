@@ -2,13 +2,14 @@ import logging
 import sys
 
 from app.core.application import EchoFlowApp
+from app.core.logger import setup_logging
 from app.ui.tray import TrayManager
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 def main() -> int:
+    setup_logging()
+
+    logger = logging.getLogger(__name__)
     logger.info("Starting EchoFlow")
 
     app = EchoFlowApp(sys.argv)

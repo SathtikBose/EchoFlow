@@ -47,6 +47,12 @@ class TrayManager(QObject):
         self.current_mode = "default"
 
         self.tray_menu.addMenu(self.mode_menu)
+
+        # Open Logs action
+        logs_action = QAction("Open Logs", self.tray_menu)
+        logs_action.triggered.connect(self._on_open_logs)
+        self.tray_menu.addAction(logs_action)
+
         self.tray_menu.addSeparator()
 
         self.start_action = QAction("Start EchoFlow")
@@ -100,6 +106,15 @@ class TrayManager(QObject):
             else QSystemTrayIcon.MessageIcon.Information
         )
         self.tray_icon.showMessage(title, message, icon, 3000)
+
+    def _on_open_logs(self) -> None:
+        import os
+
+        from app.core.logger import get_log_dir
+
+        log_dir = get_log_dir()
+        if log_dir.exists():
+            os.startfile(str(log_dir))
 
     def quit_app(self) -> None:
         self.app.quit()
