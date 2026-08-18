@@ -14,3 +14,4 @@ logs/
 *.json
 implementation_plan.md
 task.md
+*.bat
