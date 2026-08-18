@@ -28,9 +28,8 @@ class EchoFlowApp(QApplication):
 
         # Use try/except or lazy init if settings are missing?
         # For now, initialize the provider
-        self.llm_provider = NvidiaLlmProvider()
         self.speech_provider = GoogleSpeechProvider()
-        self.transcriber = TranscriptionService(self.speech_provider, self.llm_provider)
+        self.transcriber = TranscriptionService(self.speech_provider)
 
         # Audio Recorder
         self.tray = TrayManager(self)

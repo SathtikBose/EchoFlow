@@ -1,8 +1,8 @@
 import logging
 import time
 
+import pyperclip
 from pynput.keyboard import Controller, Key
-from PySide6.QtGui import QGuiApplication
 
 logger = logging.getLogger(__name__)
 
@@ -15,20 +15,18 @@ class TextInserter:
         if not text:
             return
 
-        clipboard = QGuiApplication.clipboard()
-        if clipboard is None:
-            logger.error("Failed to access system clipboard.")
-            return
-
         # 1. Save current clipboard content
-        original_text = clipboard.text()
+        try:
+            original_text = pyperclip.paste()
+        except Exception:
+            original_text = ""
 
         try:
             # 2. Set new text to clipboard (retry if another app holds it)
             clipboard_success = False
             for attempt in range(5):
                 try:
-                    clipboard.setText(text)
+                    pyperclip.copy(text)
                     clipboard_success = True
                     break
                 except Exception as clip_err:
@@ -58,6 +56,6 @@ class TextInserter:
         finally:
             # 4. Restore original clipboard content
             try:
-                clipboard.setText(original_text)
+                pyperclip.copy(original_text)
             except Exception:
                 pass

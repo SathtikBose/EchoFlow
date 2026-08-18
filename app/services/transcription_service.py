@@ -80,13 +80,7 @@ class TranscriptionService(QThread):
                     self.transcription_complete.emit(f"{original_transcript}|{snippet}")
                     return
 
-            # Step 2: LLM Transformation (if configured)
-            if self.llm_provider and transcript:
-                transcript = loop.run_until_complete(
-                    self.llm_provider.transform_text(
-                        transcript, mode=self.mode, app_context=self.app_context
-                    )
-                )
+            # Removed LLM transformation step entirely
 
             loop.close()
 
