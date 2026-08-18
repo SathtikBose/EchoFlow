@@ -24,8 +24,15 @@ class TextInserter:
         original_text = clipboard.text()
 
         try:
-            # 2. Set new text to clipboard
-            clipboard.setText(text)
+            # 2. Set new text to clipboard (retry if another app holds it)
+            for attempt in range(5):
+                try:
+                    clipboard.setText(text)
+                    break
+                except Exception as clip_err:
+                    if attempt == 4:
+                        raise clip_err
+                    time.sleep(0.05)
 
             # Wait a tiny bit for the OS to register clipboard change
             time.sleep(0.05)
