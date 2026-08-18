@@ -1,92 +1,92 @@
 # EchoFlow - AI Voice Assistant
 
-EchoFlow is a powerful, production-ready AI voice-to-text and voice-assistant application designed for Windows. It allows you to press a global hotkey, speak naturally, and instantly have your words transcribed, formatted by AI, and inserted into whatever application you are currently using.
+Welcome to **EchoFlow**! This is a simple, powerful voice assistant for Windows. It lets you press a button, speak, and it will automatically type out what you said perfectly into *any* app you are using (like Microsoft Word, Chrome, or Discord) using cutting-edge AI.
 
-## Features
-- **Global Hotkey Integration**: Press `Ctrl+Alt+Space` from anywhere to start recording.
-- **NVIDIA AI Powered**: Uses lightning-fast NVIDIA NIM APIs for Speech-to-Text and LLM transformation.
-- **AI Formatting Modes**: Choose between Default, Formal, Casual, and Code modes via the System Tray.
-- **App-Aware Context**: Automatically detects the active window (e.g., VS Code, Word) to provide domain-specific formatting.
-- **Voice Commands**: Speak commands like "press enter" or "undo" to trigger keyboard shortcuts.
-- **Snippets & Dictionary**: Automatically expand phrases like "insert signature" or correct jargon before it reaches the AI.
-- **Local History**: A lightweight local SQLite database saves your dictation history.
+If you don't know much about computers, don't worry! Follow these step-by-step instructions.
 
 ---
 
-## Getting Started (Development Setup)
+## Part 1: Setting it up for the first time
 
-### 1. Prerequisites
-- **Python 3.11** or higher
-- **Git**
-- An **NVIDIA API Key** (Get one from [build.nvidia.com](https://build.nvidia.com))
+To run this app, you just need a few basic things installed on your computer.
 
-### 2. Clone the Repository
-```cmd
-git clone https://github.com/your-username/echoflow.git
-cd echoflow
-```
+### Step 1: Install Python and Git
+1. **Download Python:** Go to [python.org/downloads](https://www.python.org/downloads/) and click "Download Python 3.11" (or whatever the latest version is). 
+   - **VERY IMPORTANT:** When you open the installer, check the box at the very bottom that says **"Add python.exe to PATH"** before you click Install.
+2. **Download Git:** Go to [git-scm.com/downloads](https://git-scm.com/downloads) and download/install Git for Windows. You can just click "Next" on all the default settings.
 
-### 3. Create a Virtual Environment & Install
-Create a Python virtual environment to keep dependencies isolated:
-```cmd
-python -m venv venv
-venv\Scripts\activate
-```
+### Step 2: Download the Code
+1. Click your Windows Start button, type `cmd`, and open **Command Prompt**.
+2. Type this exact command and press Enter to download the app to your computer:
+   ```cmd
+   git clone https://github.com/your-username/echoflow.git
+   ```
+3. Type this to go inside the newly downloaded folder:
+   ```cmd
+   cd echoflow
+   ```
 
-Install the application and its dependencies:
-```cmd
-pip install -e .
-```
-*(If you want to run tests or build the `.exe`, install the developer tools with `pip install -e .[dev]`)*
+### Step 3: Install the App
+While still in the Command Prompt (inside the `echoflow` folder), copy and paste these commands one by one, pressing Enter after each:
 
-### 4. Configuration
-Create a file named `.env` in the root directory of the project and add your NVIDIA API Key:
-```ini
-NVIDIA_API_KEY=your_api_key_here
-```
+1. Create a safe "virtual" space for the app:
+   ```cmd
+   python -m venv venv
+   ```
+2. Turn on the virtual space:
+   ```cmd
+   venv\Scripts\activate
+   ```
+3. Install all the necessary robot brains:
+   ```cmd
+   pip install -e .
+   ```
 
-### 5. Run the Application
-Start the app directly from source:
+### Step 4: Get your free NVIDIA AI Key
+EchoFlow uses NVIDIA's supercomputers to make your text perfect.
+1. Go to [build.nvidia.com](https://build.nvidia.com) and sign up for a free account.
+2. Look for "API Keys" in your account settings and generate a new key. It will look like a long string of random letters and numbers.
+3. Open the `echoflow` folder on your computer. 
+4. Find the file named `.env.example`, right-click it, and rename it to just `.env` (make sure there is a dot at the beginning).
+5. Open that `.env` file in Notepad. Delete the placeholder text and paste your key so it looks like this:
+   ```ini
+   NVIDIA_API_KEY=your_long_api_key_goes_here
+   ```
+6. Save and close Notepad.
+
+### Step 5: Start the App!
+In your Command Prompt, type:
 ```cmd
 python app/main.py
 ```
-You should see the EchoFlow icon appear in your Windows System Tray (bottom right corner).
+Look at the bottom right of your screen (near the clock). You should see a new microphone icon! **You are ready.** 
+Click anywhere you want to type, press `Ctrl + Alt + Space` on your keyboard, and start talking!
 
 ---
 
-## Building a Standalone Executable
-If you want to package EchoFlow into a `.exe` so you don't need to use the command line:
+## Part 2: How to make it run automatically on Startup
 
-1. Ensure dev tools are installed: `pip install -e .[dev]`
-2. Run the build script:
-```cmd
-python build.py
-```
-3. The executable will be generated inside the `dist/EchoFlow/` folder. You can run `EchoFlow.exe` directly.
+You probably don't want to open Command Prompt every time you restart your computer. Let's make Windows open it automatically!
 
-### Creating a Windows Installer
-To create an official installer (`Setup.exe`):
-1. Download and install [Inno Setup](https://jrsoftware.org/isinfo.php).
-2. Right-click the `echoflow.iss` file in the project folder and select **Compile**.
-3. The installer will be placed in the `Output` folder.
+1. Open your `echoflow` folder. Right-click anywhere in the empty space, select **New**, and then click **Text Document**.
+2. Name it `start_echoflow.bat` (make sure you delete the `.txt` part at the end. Windows might warn you about changing the extension, click Yes).
+3. Right-click `start_echoflow.bat` and click **Edit** (this will open Notepad).
+4. Paste the following text into Notepad exactly as it is:
+   ```bat
+   @echo off
+   cd /d "%~dp0"
+   call venv\Scripts\activate.bat
+   start /B pythonw app/main.py
+   ```
+5. Save and close Notepad. *(If you double-click this file now, it will secretly start the app in the background!)*
+6. Now, hold the `Windows Key` on your keyboard and press `R`. A small "Run" box will appear.
+7. Type `shell:startup` into the box and press Enter. A folder will pop open.
+8. Right-click your new `start_echoflow.bat` file, and click **Create shortcut**.
+9. Drag that shortcut into the `Startup` folder that popped open in Step 7.
+
+**You're done!** Now, every time you turn on your PC, EchoFlow will wake up in the background and wait for your hotkey. 
 
 ---
 
-## How to Make EchoFlow a Startup App
-
-If you want EchoFlow to start automatically whenever you turn on your PC:
-
-**Method 1: Windows Startup Folder (Easiest)**
-1. Press `Win + R` on your keyboard to open the Run dialog.
-2. Type `shell:startup` and press Enter. This opens your Windows Startup folder.
-3. Find your built `EchoFlow.exe` (inside the `dist/EchoFlow` folder).
-4. Right-click `EchoFlow.exe` and select **Create shortcut**.
-5. Drag and drop that new shortcut into the `Startup` folder you opened in Step 2.
-
-**Method 2: Using the Inno Setup Installer**
-If you build the project using the provided `echoflow.iss` script, you can easily modify the script to add a registry key that runs the app on startup. Add this under the `[Registry]` section of the `.iss` file:
-```ini
-[Registry]
-Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "EchoFlow"; ValueData: """{app}\EchoFlow.exe"""; Flags: uninsdeletevalue
-```
-When you run the installer, it will automatically configure Windows to launch EchoFlow on boot.
+### Need to check logs or change modes?
+Just right-click the microphone icon near your clock. You can switch between Formal or Casual typing, and even open the logs if something breaks. Enjoy!
