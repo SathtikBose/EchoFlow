@@ -26,21 +26,29 @@ class EchoFlowApp(QApplication):
         # State
         self.current_mode = "default"
 
+        # Audio Recorder
+        self.recorder = AudioRecorder()
+        self.recorder.audio_ready.connect(self._on_audio_ready)
+        self.recorder.error_occurred.connect(self._on_recorder_error)
+
+        # UI Overlay
+        from app.ui.overlay import RecordingOverlay
+        self.overlay = RecordingOverlay()
+
+        # UI Tray
+        self.tray = TrayManager(self)
+        self.tray.mode_changed.connect(self._on_mode_changed)
+
+        # Hotkeys
+        self.hotkey_manager = HotkeyManager()
+        self.hotkey_manager.hotkey_pressed.connect(self._on_hotkey_pressed)
+        self.hotkey_manager.hotkey_released.connect(self._on_hotkey_released)
+        self.hotkey_manager.hotkey_locked.connect(self._on_hotkey_locked)
+
         # Use try/except or lazy init if settings are missing?
         # For now, initialize the provider
         self.speech_provider = GoogleSpeechProvider()
         self.transcriber = TranscriptionService(self.speech_provider)
-
-        # Audio Recorder
-        self.tray = TrayManager(self)
-        self.tray.mode_changed.connect(self._on_mode_changed)
-
-        # Wire up hotkeys to audio recording
-        self.hotkeys.hotkey_pressed.connect(self.recorder.start_recording)
-        self.hotkeys.hotkey_released.connect(self.recorder.stop_recording)
-
-        # Handle audio ready
-        self.recorder.audio_ready.connect(self._on_audio_ready)
 
         # Handle transcription results
         self.transcriber.transcription_complete.connect(self._on_transcription_complete)
@@ -77,6 +85,23 @@ class EchoFlowApp(QApplication):
 
     def _on_transcription_error(self, error: str) -> None:
         print(f"App: Transcription failed: {error}")
+
+    def _on_hotkey_pressed(self) -> None:
+        """Triggered when the hotkey is initially pressed."""
+        self.overlay.show_overlay(locked=False)
+        self.recorder.start_recording()
+
+    def _on_hotkey_locked(self) -> None:
+        """Triggered when the hotkey is double-clicked to lock."""
+        self.overlay.set_locked(True)
+
+    def _on_hotkey_released(self) -> None:
+        """Triggered when the hotkey is released (or double-click lock is stopped)."""
+        self.overlay.hide_overlay()
+        self.recorder.stop_recording()
+
+    def _on_recorder_error(self, error: str) -> None:
+        print(f"App: Recorder error: {error}")
 
     def _on_command_executed(self, command: str) -> None:
         print(f"App: {command}")
