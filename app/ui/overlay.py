@@ -33,7 +33,8 @@ class RecordingOverlay(QWidget):
         self.is_locked = locked
         
         screen = QApplication.primaryScreen()
-        cursor_pos = QApplication.primaryScreen().cursor().pos()
+        from PySide6.QtGui import QCursor
+        cursor_pos = QCursor.pos()
         # Find which screen the cursor is currently on
         for s in QApplication.screens():
             if s.geometry().contains(cursor_pos):
