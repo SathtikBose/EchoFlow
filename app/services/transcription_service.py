@@ -3,6 +3,7 @@ import logging
 
 from PySide6.QtCore import QThread, Signal
 
+from app.input.commands import CommandProcessor
 from app.llm.base import LlmProvider
 from app.speech.base import SpeechProvider
 
@@ -13,6 +14,7 @@ class TranscriptionService(QThread):
     # Signals for success and failure
     transcription_complete = Signal(str)
     transcription_error = Signal(str)
+    command_executed = Signal(str)
 
     def __init__(
         self, speech_provider: SpeechProvider, llm_provider: LlmProvider | None = None
@@ -20,6 +22,7 @@ class TranscriptionService(QThread):
         super().__init__()
         self.speech_provider = speech_provider
         self.llm_provider = llm_provider
+        self.command_processor = CommandProcessor()
         self.audio_data: bytes | None = None
         self.mode: str = "default"
 
@@ -46,6 +49,12 @@ class TranscriptionService(QThread):
 
             # Step 1: Speech to Text
             transcript = loop.run_until_complete(self.speech_provider.transcribe(self.audio_data))
+
+            # Step 1.5: Voice Command check
+            if transcript and self.command_processor.process(transcript):
+                loop.close()
+                self.command_executed.emit(f"Command: {transcript.strip()}")
+                return
 
             # Step 2: LLM Transformation (if configured)
             if self.llm_provider and transcript:

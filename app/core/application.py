@@ -44,6 +44,7 @@ class EchoFlowApp(QApplication):
         # Handle transcription results
         self.transcriber.transcription_complete.connect(self._on_transcription_complete)
         self.transcriber.transcription_error.connect(self._on_transcription_error)
+        self.transcriber.command_executed.connect(self._on_command_executed)
 
         # Start hotkey listener
         self.hotkeys.start()
@@ -63,6 +64,10 @@ class EchoFlowApp(QApplication):
 
     def _on_transcription_error(self, error: str) -> None:
         print(f"App: Transcription failed: {error}")
+
+    def _on_command_executed(self, command: str) -> None:
+        print(f"App: {command}")
+        self.tray.notify("Command Executed", command)
 
     def shutdown(self) -> None:
         self.hotkeys.stop()
