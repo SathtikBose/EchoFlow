@@ -13,9 +13,22 @@ class HotkeyManager(QObject):
 
     def __init__(self) -> None:
         super().__init__()
-        # Define the hotkey combination. Default: Ctrl + Space
-        # We parse it into a set of keys that need to be active.
-        self.hotkey = keyboard.HotKey(keyboard.HotKey.parse("<ctrl>+<space>"), self._on_activate)
+        from app.core.config import settings
+
+        # Parse hotkey string from settings (e.g. "ctrl+alt+space" -> "<ctrl>+<alt>+<space>")
+        raw_keys = settings.echoflow_hotkey.split("+")
+        formatted_keys = []
+        for k in raw_keys:
+            k = k.strip().lower()
+            if len(k) > 1 and not k.startswith("<"):
+                formatted_keys.append(f"<{k}>")
+            else:
+                formatted_keys.append(k)
+        
+        parsed_hotkey_str = "+".join(formatted_keys)
+        logger.info(f"Configured hotkey: {parsed_hotkey_str}")
+
+        self.hotkey = keyboard.HotKey(keyboard.HotKey.parse(parsed_hotkey_str), self._on_activate)
 
         self.listener: keyboard.Listener | None = None
         self._is_active = False

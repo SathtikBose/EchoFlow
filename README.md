@@ -51,6 +51,9 @@ EchoFlow uses NVIDIA's supercomputers to make your text perfect.
 5. Open that `.env` file in Notepad. Delete the placeholder text and paste your key so it looks like this:
    ```ini
    NVIDIA_API_KEY=your_long_api_key_goes_here
+   
+   # Optional: Change the hotkey (default is ctrl+space)
+   ECHOFLOW_HOTKEY=ctrl+alt+space
    ```
 6. Save and close Notepad.
 

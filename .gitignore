@@ -10,4 +10,7 @@ dist/
 *.spec
 Output/
 logs/
-echoflow.db
+*.db
+*.json
+implementation_plan.md
+task.md

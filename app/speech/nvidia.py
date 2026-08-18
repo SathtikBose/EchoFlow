@@ -19,7 +19,9 @@ class NvidiaSpeechProvider(SpeechProvider):
         if not self.api_key:
             raise ValueError("NVIDIA API key is not configured.")
 
-        endpoint = f"{self.base_url.rstrip('/')}/audio/transcriptions"
+        # Audio APIs are often hosted on ai.api.nvidia.com instead of integrate.api.nvidia.com
+        base_url = self.base_url.replace("integrate.api.nvidia.com", "ai.api.nvidia.com")
+        endpoint = f"{base_url.rstrip('/')}/audio/transcriptions"
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Accept": "application/json",
@@ -50,5 +52,5 @@ class NvidiaSpeechProvider(SpeechProvider):
             logger.error(f"NVIDIA API HTTP error {e.response.status_code}: {e.response.text}")
             raise Exception(f"Transcription service error: {e.response.status_code}") from e
         except Exception as e:
-            logger.error(f"Unexpected error during transcription: {e}")
-            raise Exception(f"Transcription failed: {str(e)}") from e
+            logger.exception("Unexpected error during transcription")
+            raise Exception(f"Transcription failed: {repr(e)}") from e

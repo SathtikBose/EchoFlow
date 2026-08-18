@@ -93,5 +93,5 @@ class TranscriptionService(QThread):
             self.transcription_complete.emit(f"{original_transcript}|{transcript}")
 
         except Exception as e:
-            logger.error(f"Transcription service error: {e}")
-            self.transcription_error.emit(str(e))
+            logger.exception("Transcription service error")
+            self.transcription_error.emit(repr(e))
