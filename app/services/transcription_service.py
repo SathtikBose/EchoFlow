@@ -5,6 +5,7 @@ from PySide6.QtCore import QThread, Signal
 
 from app.input.commands import CommandProcessor
 from app.input.dictionary import DictionaryProcessor
+from app.input.snippets import SnippetProcessor
 from app.llm.base import LlmProvider
 from app.speech.base import SpeechProvider
 
@@ -25,6 +26,7 @@ class TranscriptionService(QThread):
         self.llm_provider = llm_provider
         self.command_processor = CommandProcessor()
         self.dictionary_processor = DictionaryProcessor()
+        self.snippet_processor = SnippetProcessor()
         self.audio_data: bytes | None = None
         self.mode: str = "default"
 
@@ -64,6 +66,15 @@ class TranscriptionService(QThread):
                 loop.close()
                 self.command_executed.emit(f"Command: {transcript.strip()}")
                 return
+
+            # Step 1.8: Snippet expansion
+            if transcript:
+                snippet = self.snippet_processor.process(transcript)
+                if snippet:
+                    loop.close()
+                    # Skip LLM and just return the expanded snippet
+                    self.transcription_complete.emit(f"{original_transcript}|{snippet}")
+                    return
 
             # Step 2: LLM Transformation (if configured)
             if self.llm_provider and transcript:
